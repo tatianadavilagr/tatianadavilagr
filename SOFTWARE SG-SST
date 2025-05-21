@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SG-SST - IEB Ingeniería Especializada</title>
+    <style>
+        :root {
+            --primary-color: #0056b3; /* Azul corporativo (ejemplo) */
+            --secondary-color: #007bff;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        .user-info {
+            font-size: 0.9em;
+        }
+        .user-info a#logoutButton { /* Added ID for JS */
+            color:white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .user-info a#logoutButton:hover {
+            text-decoration: underline;
+        }
+
+
+        .main-container {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        nav {
+            background-color: #ffffff;
+            width: 250px;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            overflow-y: auto;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li a {
+            display: block;
+            padding: 12px 15px;
+            color: var(--dark-gray);
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .module-content {
+            display: none; /* Ocultar todos los módulos por defecto */
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .module-content.active {
+            display: block; /* Mostrar módulo activo */
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        h3 {
+            color: var(--secondary-color);
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--light-gray);
+            font-weight: bold;
+        }
+
+        .actions button {
+            margin-right: 5px;
+            padding: 5px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .btn-edit { background-color: var(--warning-color); color: black; }
+        .btn-delete { background-color: var(--danger-color); color: white; }
+        .btn-view { background-color: var(--secondary-color); color: white; }
+        .btn-add, .btn-save {
+            background-color: var(--success-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+            margin-left: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: calc(100% - 22px); /* Adjusted for padding and border */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+         .form-group select[multiple] {
+            height: auto;
+            min-height: 100px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 60%;
+            max-width: 700px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .dashboard-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            flex: 1 1 300px; /* Flex properties for responsiveness */
+            min-width: 250px;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        .card p {
+            font-size: 1.5em;
+            margin: 10px 0 0;
+            font-weight: bold;
+        }
+        .card .details {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        footer {
+            background-color: var(--dark-gray);
+            color: var(--light-gray);
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9em;
+        }
+
+        /* Styling for sub-sections within a module */
+        .sub-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+        }
+        .sub-section:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SG-SST - IEB Ingeniería Especializada</h1>
+        <div class="user-info">
+            <span>Usuario: Auditor Experto</span> | <a href="#" id="logoutButton">Cerrar Sesión</a>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <nav>
+            <ul>
+                <li><a href="#" class="nav-link active" data-module="dashboard">Dashboard</a></li>
+                <li><a href="#" class="nav-link" data-module="empleados">Gestión de Empleados</a></li>
+                <li><a href="#" class="nav-link" data-module="planificacion">Planificación del SG-SST</a></li>
+                <li><a href="#" class="nav-link" data-module="implementacion">Implementación del SG-SST</a></li>
+                <li><a href="#" class="nav-link" data-module="verificacion">Verificación y Auditoría</a></li>
+                <li><a href="#" class="nav-link" data-module="mejora">Mejora Continua</a></li>
+                <li><a href="#" class="nav-link" data-module="documentacion">Gestión Documental</a></li>
+                <li><a href="#" class="nav-link" data-module="configuracion">Configuración</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- MÓDULO: Dashboard -->
+            <div id="dashboard" class="module-content active">
+                <h2>Dashboard Principal</h2>
+                <p>Bienvenido al Sistema de Gestión de Seguridad y Salud en el Trabajo de IEB Ingeniería Especializada.</p>
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <h3>Empleados Activos</h3>
+                        <p id="db-empleados-activos">0</p>
+                        <span class="details">Total registrados</span>
+                    </div>
+                    <div class="card">
+                        <h3>Incidentes Reportados (Mes)</h3>
+                        <p id="db-incidentes-mes">0</p>
+                        <span class="details">Últimos 30 días</span>
+                    </div>
+                    <div class="card">
+                        <h3>Capacitaciones Pendientes</h3>
+                        <p id="db-capacitaciones-pendientes">0</p>
+                        <span class="details">Requieren programación</span>
+                    </div>
+                    <div class="card">
+                        <h3>Cumplimiento Plan Anual</h3>
+                        <p id="db-cumplimiento-plan">0%</p>
+                        <span class="details">Progreso general</span>
+                    </div>
+                </div>
+                <div class="sub-section">
+                    <h3>Alertas y Notificaciones</h3>
+                    <ul id="alert-list">
+                        <li>Revisar EPPs con próxima fecha de vencimiento (Simulación).</li>
+                        <li>Auditoría interna programada para DD/MM/AAAA (Simulación).</li>
+                        <li>Nueva política de SST publicada con fecha <span id="alert-fecha-politica">N/A</span>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- MÓDULO: Gestión de Empleados -->
+            <div id="empleados" class="module-content">
+                <h2>Gestión de Empleados</h2>
+                <button class="btn-add" onclick="showEmpleadoModal()">Agregar Empleado</button>
+                <table id="tablaEmpleados">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Completo</th>
+                            <th>Cargo</th>
+                            <th>Área</th>
+                            <th>Fecha Ingreso</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Los datos se cargarán aquí por JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- MÓDULO: Planificación del SG-SST -->
+            <div id="planificacion" class="module-content">
+                <h2>Planificación del SG-SST</h2>
+                <p>Defina y gestione los elementos clave de la planificación según el Decreto 1072 y Res. 0312.</p>
+                
+                <div class="sub-section">
+                    <h3>Política de SST</h3>
+                    <div class="form-group">
+                        <label for="politicaSST">Texto de la Política:</label>
+                        <textarea id="politicaSST" rows="6">IEB Ingeniería Especializada se compromete con la protección y promoción de la salud de los trabajadores, procurando su integridad física mediante el control de los riesgos, el mejoramiento continuo de los procesos y la protección del medio ambiente.</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaPoliticaSST">Fecha de Publicación/Revisión:</label>
+                        <input type="date" id="fechaPoliticaSST" value="2023-01-15">
+                    </div>
+                    <button class="btn-save" onclick="guardarPolitica()">Guardar Política</button>
+                </div>
+
+                <div class="sub-section">
+                    <h3>Objetivos del SG-SST</h3>
+                    <button class="btn-add" onclick="showObjetivoModal()">Agregar Objetivo</button>
+                    <table id="tablaObjetivos">
+                        <thead>
+                            <tr><th>ID</th><th>Descripción</th><th>Indicador</th><th>Meta</th><th>Responsable</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="sub-section">
+                    <h3>Identificación de Peligros, Evaluación y Valoración de Riesgos (IPEVR)</h3>
+                    <button class="btn-add" onclick="showIPEVRModal()">Agregar Riesgo Identificado</button>
+                    <table id="tablaIPEVR">
+                        <thead>
+                            <tr><th>ID</th><th>Proceso</th><th>Actividad</th><th>Peligro</th><th>Riesgo</th><th>Controles</th><th>Nivel Riesgo</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                
+                <div class="sub-section">
+                    <h3>Plan de Trabajo Anual</h3>
+                     <button class="btn-add" onclick="showPlanTrabajoModal()">Agregar Actividad al Plan</button>
+                    <table id="tablaPlanTrabajo">
+                        <thead>
+                            <tr><th>Actividad</th><th>Responsable</th><th>Recursos</th><th>Fecha Inicio</th><th>Fecha Fin</th><th>Estado</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody><!-- Datos de ejemplo o gestionados por JS --></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MÓDULO: Implementación del SG-SST -->
+            <div id="implementacion" class="module-content">
+                <h2>Implementación del SG-SST</h2>
+                <p>Gestione las actividades de implementación del sistema.</p>
+
+                <div class="sub-section">
+                    <h3>Capacitaciones y Entrenamiento</h3>
+                    <button class="btn-add" onclick="showCapacitacionModal()">Programar Capacitación</button>
+                    <table id="tablaCapacitaciones">
+                        <thead>
+                            <tr><th>Tema</th><th>Fecha</th><th>Instructor</th><th>Participantes (IDs Empleados)</th><th>Estado</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="sub-section">
+                    <h3>Gestión de Elementos de Protección Personal (EPP)</h3>
+                    <button class="btn-add" onclick="showEPPModal()">Registrar Entrega EPP</button>
+                    <table id="tablaEPP">
+                        <thead>
+                            <tr><th>Empleado (ID)</th><th>EPP Entregado</th><th>Fecha Entrega</th><th>Fecha Próx. Cambio</th><th>Cantidad</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                
+                <div class="sub-section">
+                    <h3>Investigación de Incidentes, Accidentes y Enfermedades Laborales</h3>
+                    <button class="btn-add" onclick="showIncidenteModal()">Reportar Incidente/Accidente</button>
+                    <table id="tablaIncidentes">
+                        <thead>
+                            <tr><th>ID</th><th>Tipo</th><th>Fecha</th><th>Descripción</th><th>Empleado(s) Involucrado(s)</th><th>Estado Investigación</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MÓDULO: Verificación y Auditoría -->
+            <div id="verificacion" class="module-content">
+                <h2>Verificación y Auditoría</h2>
+                <p>Realice seguimiento, medición, análisis y evaluación del desempeño.</p>
+                 <div class="sub-section">
+                    <h3>Auditorías Internas</h3>
+                    <button class="btn-add" onclick="showAuditoriaModal()">Programar Auditoría</button>
+                    <table id="tablaAuditorias">
+                        <thead>
+                            <tr><th>ID</th><th>Alcance</th><th>Fecha Programada</th><th>Auditor Líder</th><th>Estado</th><th>Hallazgos</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="sub-section">
+                    <h3>Revisión por la Dirección</h3>
+                     <div class="form-group">
+                        <label for="fechaRevisionDir">Fecha Última Revisión:</label>
+                        <input type="date" id="fechaRevisionDir">
+                    </div>
+                    <div class="form-group">
+                        <label for="conclusionesRevisionDir">Conclusiones y Decisiones:</label>
+                        <textarea id="conclusionesRevisionDir" rows="5"></textarea>
+                    </div>
+                    <button class="btn-save" onclick="guardarRevisionDir()">Guardar Revisión</button>
+                </div>
+            </div>
+
+            <!-- MÓDULO: Mejora Continua -->
+            <div id="mejora" class="module-content">
+                <h2>Mejora Continua</h2>
+                <p>Gestione las acciones correctivas, preventivas y de mejora.</p>
+                <button class="btn-add" onclick="showAccionMejoraModal()">Registrar Acción</button>
+                <table id="tablaAccionesMejora">
+                    <thead>
+                        <tr><th>ID</th><th>Tipo (Correctiva/Preventiva)</th><th>Origen (Auditoría, Incidente, etc.)</th><th>Descripción</th><th>Responsable</th><th>Fecha Límite</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- MÓDULO: Gestión Documental -->
+            <div id="documentacion" class="module-content">
+                <h2>Gestión Documental</h2>
+                <p>Centralice y controle los documentos del SG-SST.</p>
+                <div class="form-group">
+                    <label for="buscarDocumento">Buscar Documento:</label>
+                    <input type="text" id="buscarDocumento" placeholder="Nombre, código, palabra clave..." onkeyup="filtrarDocumentos()">
+                </div>
+                <button class="btn-add" onclick="showDocumentoModal()">Subir Nuevo Documento</button>
+                <table id="tablaDocumentos">
+                    <thead>
+                        <tr><th>Nombre Documento</th><th>Código</th><th>Versión</th><th>Fecha Publicación</th><th>Tipo</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="bodyTablaDocumentos">
+                        <!-- Datos de ejemplo o gestionados por JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- MÓDULO: Configuración -->
+            <div id="configuracion" class="module-content">
+                <h2>Configuración</h2>
+                <p>Ajustes generales del sistema.</p>
+                <div class="form-group">
+                    <label for="empresaNombre">Nombre de la Empresa:</label>
+                    <input type="text" id="empresaNombre" value="IEB Ingeniería Especializada">
+                </div>
+                <div class="form-group">
+                    <label for="empresaNit">NIT:</label>
+                    <input type="text" id="empresaNit" value="900.XXX.XXX-X">
+                </div>
+                 <div class="form-group">
+                    <label for="responsableSST">Responsable del SG-SST:</label>
+                    <input type="text" id="responsableSST" value="Nombre del Responsable">
+                </div>
+                <button class="btn-save" onclick="guardarConfiguracion()">Guardar Configuración</button>
+            </div>
+
+        </main>
+    </div>
+
+    <footer>
+        <p>© <span id="currentYear"></span> IEB Ingeniería Especializada - Software SG-SST. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- MODAL GENÉRICO (El contenido se cambiará con JS) -->
+    <div id="genericModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">×</span>
+            <h3 id="modalTitle">Título del Modal</h3>
+            <div id="modalBody">
+                <!-- Contenido del formulario del modal aquí -->
+            </div>
+            <div id="modalFooter">
+                <button class="btn-save" id="modalSaveButton">Guardar</button>
+                <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NAVEGACIÓN ENTRE MÓDULOS ---
+        const navLinks = document.querySelectorAll('.nav-link');
+        const moduleContents = document.querySelectorAll('.module-content');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                
+                navLinks.forEach(lnk => lnk.classList.remove('active'));
+                link.classList.add('active');
+                
+                const targetModule = link.getAttribute('data-module');
+                
+                moduleContents.forEach(content => {
+                    if (content.id === targetModule) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+                // Si se selecciona el dashboard, actualizar sus estadísticas
+                if (targetModule === 'dashboard') {
+                    updateDashboardStats();
+                }
+            });
+        });
+
+        document.getElementById('logoutButton').addEventListener('click', (event) => {
+            event.preventDefault();
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                alert('Sesión cerrada (simulación). En una aplicación real, serías redirigido.');
+                // Aquí iría la lógica para invalidar la sesión, limpiar tokens, etc.
+            }
+        });
+
+        // --- DATOS DE EJEMPLO Y LÓGICA DE MÓDULOS ---
+        // (En una aplicación real, esto vendría de un backend y base de datos)
+
+        // Gestión de Empleados
+        let empleados = [
+            { id: 1, nombre: "Carlos Pérez", cargo: "Ingeniero Residente", area: "Operaciones", fechaIngreso: "2020-05-15" },
+            { id: 2, nombre: "Ana Rodríguez", cargo: "Auxiliar Administrativa", area: "Administración", fechaIngreso: "2021-02-01" }
+        ];
+        let nextEmpleadoId = 3;
+
+        function renderTablaEmpleados() {
+            const tbody = document.getElementById('tablaEmpleados').querySelector('tbody');
+            tbody.innerHTML = ''; // Limpiar tabla
+            empleados.forEach(emp => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${emp.id}</td>
+                    <td>${emp.nombre}</td>
+                    <td>${emp.cargo}</td>
+                    <td>${emp.area}</td>
+                    <td>${emp.fechaIngreso}</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="showEmpleadoModal(${emp.id})">Editar</button>
+                        <button class="btn-delete" onclick="deleteEmpleado(${emp.id})">Eliminar</button>
+                    </td>
+                `;
+            });
+            updateDashboardStats();
+        }
+        
+        function showEmpleadoModal(id = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalSaveButton = document.getElementById('modalSaveButton');
+            let empleado = id ? empleados.find(e => e.id === id) : null;
+
+            modalTitle.textContent = empleado ? 'Editar Empleado' : 'Agregar Empleado';
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label for="empNombre">Nombre Completo:</label>
+                    <input type="text" id="empNombre" value="${empleado ? empleado.nombre : ''}" required>
+                </div>
+                <div class="form-group">
+                    <label for="empCargo">Cargo:</label>
+                    <input type="text" id="empCargo" value="${empleado ? empleado.cargo : ''}" required>
+                </div>
+                <div class="form-group">
+                    <label for="empArea">Área:</label>
+                    <input type="text" id="empArea" value="${empleado ? empleado.area : ''}" required>
+                </div>
+                <div class="form-group">
+                    <label for="empFechaIngreso">Fecha Ingreso:</label>
+                    <input type="date" id="empFechaIngreso" value="${empleado ? empleado.fechaIngreso : ''}" required>
+                </div>
+            `;
+            
+            modalSaveButton.onclick = () => saveEmpleado(id);
+            document.getElementById('genericModal').style.display = 'block';
+        }
+
+        function saveEmpleado(id = null) {
+            const nombre = document.getElementById('empNombre').value;
+            const cargo = document.getElementById('empCargo').value;
+            const area = document.getElementById('empArea').value;
+            const fechaIngreso = document.getElementById('empFechaIngreso').value;
+
+            if (!nombre || !cargo || !area || !fechaIngreso) {
+                alert('Por favor, complete todos los campos.');
+                return;
+            }
+
+            if (id) { // Editando
+                const index = empleados.findIndex(e => e.id === id);
+                if (index > -1) {
+                    empleados[index] = { ...empleados[index], nombre, cargo, area, fechaIngreso };
+                }
+            } else { // Agregando
+                empleados.push({ id: nextEmpleadoId++, nombre, cargo, area, fechaIngreso });
+            }
+            renderTablaEmpleados();
+            closeModal();
+        }
+
+        function editEmpleado(id) { // Ya se usa en showEmpleadoModal, pero la dejamos por si se llama desde otro lado
+            showEmpleadoModal(id);
+        }
+
+        function deleteEmpleado(id) {
+            if (confirm('¿Está seguro de eliminar este empleado?')) {
+                empleados = empleados.filter(e => e.id !== id);
+                renderTablaEmpleados();
+            }
+        }
+        
+        // Planificación - Política
+        function guardarPolitica() {
+            const politicaTexto = document.getElementById('politicaSST').value;
+            const fechaPolitica = document.getElementById('fechaPoliticaSST').value;
+            if (!politicaTexto || !fechaPolitica) {
+                alert('Por favor, complete el texto de la política y la fecha.');
+                return;
+            }
+            localStorage.setItem('politicaSST', JSON.stringify({ texto: politicaTexto, fecha: fechaPolitica }));
+            alert(`Política guardada correctamente.\nFecha: ${fechaPolitica}`);
+            document.getElementById('alert-fecha-politica').textContent = fechaPolitica;
+            updateDashboardStats();
+        }
+        function cargarPoliticaGuardada() {
+            const politicaGuardada = localStorage.getItem('politicaSST');
+            if (politicaGuardada) {
+                const data = JSON.parse(politicaGuardada);
+                document.getElementById('politicaSST').value = data.texto;
+                document.getElementById('fechaPoliticaSST').value = data.fecha;
+                document.getElementById('alert-fecha-politica').textContent = data.fecha;
+            }
+        }
+
+        // Planificación - Objetivos SST
+        let objetivosSST = [
+            {id: 1, descripcion: "Reducir la tasa de accidentabilidad en un 10% para fin de año.", indicador: "Tasa de Accidentalidad (TA)", meta: "10% Reducción", responsable: "Gerencia General, Coordinador SST"},
+            {id: 2, descripcion: "Capacitar al 100% de los trabajadores en prevención de riesgos laborales.", indicador: "% Trabajadores Capacitados", meta: "100%", responsable: "Coordinador SST, RRHH"},
+        ];
+        let nextObjetivoId = 3;
+
+        function renderTablaObjetivos() {
+            const tbody = document.getElementById('tablaObjetivos').querySelector('tbody');
+            tbody.innerHTML = '';
+            objetivosSST.forEach(obj => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${obj.id}</td>
+                    <td>${obj.descripcion}</td>
+                    <td>${obj.indicador}</td>
+                    <td>${obj.meta}</td>
+                    <td>${obj.responsable}</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="showObjetivoModal(${obj.id})">Editar</button>
+                        <button class="btn-delete" onclick="deleteObjetivo(${obj.id})">Eliminar</button>
+                    </td>
+                `;
+            });
+        }
+        function showObjetivoModal(id = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalSaveButton = document.getElementById('modalSaveButton');
+            let objetivo = id ? objetivosSST.find(o => o.id === id) : null;
+
+            modalTitle.textContent = objetivo ? 'Editar Objetivo SST' : 'Agregar Objetivo SST';
+            modalBody.innerHTML = `
+                <div class="form-group"><label for="objDescripcion">Descripción:</label><textarea id="objDescripcion" required>${objetivo ? objetivo.descripcion : ''}</textarea></div>
+                <div class="form-group"><label for="objIndicador">Indicador:</label><input type="text" id="objIndicador" value="${objetivo ? objetivo.indicador : ''}" required></div>
+                <div class="form-group"><label for="objMeta">Meta:</label><input type="text" id="objMeta" value="${objetivo ? objetivo.meta : ''}" required></div>
+                <div class="form-group"><label for="objResponsable">Responsable:</label><input type="text" id="objResponsable" value="${objetivo ? objetivo.responsable : ''}" required></div>
+            `;
+            modalSaveButton.onclick = () => saveObjetivo(id);
+            document.getElementById('genericModal').style.display = 'block';
+        }
+        function saveObjetivo(id = null) {
+            const descripcion = document.getElementById('objDescripcion').value;
+            const indicador = document.getElementById('objIndicador').value;
+            const meta = document.getElementById('objMeta').value;
+            const responsable = document.getElementById('objResponsable').value;
+            if(!descripcion || !indicador || !meta || !responsable) { alert('Complete todos los campos del objetivo.'); return; }
+
+            if (id) {
+                const index = objetivosSST.findIndex(o => o.id === id);
+                if (index > -1) objetivosSST[index] = { ...objetivosSST[index], descripcion, indicador, meta, responsable };
+            } else {
+                objetivosSST.push({ id: nextObjetivoId++, descripcion, indicador, meta, responsable });
+            }
+            renderTablaObjetivos();
+            closeModal();
+        }
+        function deleteObjetivo(id) {
+            if (confirm('¿Eliminar este objetivo del SG-SST?')) {
+                objetivosSST = objetivosSST.filter(o => o.id !== id);
+                renderTablaObjetivos();
+            }
+        }
+
+        // Planificación - IPEVR
+        let ipevrData = [
+            {id: 1, proceso: "Instalación Eléctrica BT", actividad: "Cableado en Altura (Postes)", peligro: "Caída a distinto nivel, Contacto eléctrico", riesgo: "Fracturas, quemaduras, fatalidad", controles: "Arnés seguridad, línea de vida, guantes dieléctricos, delimitación área", nivelRiesgo: "Alto"},
+            {id: 2, proceso: "Trabajos de Oficina", actividad: "Uso de Computador", peligro: "Ergonómico (Posturas prolongadas), Visual", riesgo: "Desórdenes músculo-esqueléticos, Fatiga visual", controles: "Pausas activas, Silla ergonómica, Monitor a la altura", nivelRiesgo: "Medio"},
+        ];
+        let nextIpevrId = 3;
+        function renderTablaIPEVR() {
+            const tbody = document.getElementById('tablaIPEVR').querySelector('tbody');
+            tbody.innerHTML = '';
+            ipevrData.forEach(item => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.proceso}</td>
+                    <td>${item.actividad}</td>
+                    <td>${item.peligro}</td>
+                    <td>${item.riesgo}</td>
+                    <td>${item.controles}</td>
+                    <td>${item.nivelRiesgo}</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="showIPEVRModal(${item.id})">Editar</button>
+                        <button class="btn-delete" onclick="deleteIPEVR(${item.id})">Eliminar</button>
+                    </td>
+                `;
+            });
+        }
+        function showIPEVRModal(id = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalSaveButton = document.getElementById('modalSaveButton');
+            let item = id ? ipevrData.find(i => i.id === id) : null;
+
+            modalTitle.textContent = item ? 'Editar Riesgo IPEVR' : 'Agregar Riesgo Identificado (IPEVR)';
+            modalBody.innerHTML = `
+                <div class="form-group"><label>Proceso:</label><input type="text" id="ipevrProceso" value="${item ? item.proceso : ''}" required></div>
+                <div class="form-group"><label>Actividad:</label><input type="text" id="ipevrActividad" value="${item ? item.actividad : ''}" required></div>
+                <div class="form-group"><label>Peligro (Descripción, Clasificación):</label><textarea id="ipevrPeligro" required>${item ? item.peligro : ''}</textarea></div>
+                <div class="form-group"><label>Riesgo (Efectos Posibles):</label><textarea id="ipevrRiesgo" required>${item ? item.riesgo : ''}</textarea></div>
+                <div class="form-group"><label>Controles Existentes (Fuente, Medio, Individuo):</label><textarea id="ipevrControles">${item ? item.controles : ''}</textarea></div>
+                <div class="form-group">
+                    <label>Nivel de Riesgo:</label>
+                    <select id="ipevrNivelRiesgo" required>
+                        <option value="Bajo" ${item && item.nivelRiesgo === 'Bajo' ? 'selected' : ''}>Bajo</option>
+                        <option value="Medio" ${item && item.nivelRiesgo === 'Medio' ? 'selected' : ''}>Medio</option>
+                        <option value="Alto" ${item && item.nivelRiesgo === 'Alto' ? 'selected' : ''}>Alto</option>
+                        <option value="Muy Alto" ${item && item.nivelRiesgo === 'Muy Alto' ? 'selected' : ''}>Muy Alto</option>
+                    </select>
+                </div>
+            `;
+            modalSaveButton.onclick = () => saveIPEVR(id);
+            document.getElementById('genericModal').style.display = 'block';
+        }
+        function saveIPEVR(id = null) {
+            const proceso = document.getElementById('ipevrProceso').value;
+            const actividad = document.getElementById('ipevrActividad').value;
+            const peligro = document.getElementById('ipevrPeligro').value;
+            const riesgo = document.getElementById('ipevrRiesgo').value;
+            const controles = document.getElementById('ipevrControles').value;
+            const nivelRiesgo = document.getElementById('ipevrNivelRiesgo').value;
+            if(!proceso || !actividad || !peligro || !riesgo || !nivelRiesgo) { alert('Complete los campos requeridos del IPEVR.'); return; }
+
+            if (id) {
+                const index = ipevrData.findIndex(i => i.id === id);
+                if (index > -1) ipevrData[index] = { ...ipevrData[index], proceso, actividad, peligro, riesgo, controles, nivelRiesgo };
+            } else {
+                ipevrData.push({ id: nextIpevrId++, proceso, actividad, peligro, riesgo, controles, nivelRiesgo });
+            }
+            renderTablaIPEVR();
+            closeModal();
+        }
+        function deleteIPEVR(id) {
+            if (confirm('¿Eliminar este registro de IPEVR?')) {
+                ipevrData = ipevrData.filter(i => i.id !== id);
+                renderTablaIPEVR();
+            }
+        }
+
+        // Planificación - Plan de Trabajo Anual (Esqueleto)
+        let planTrabajoData = [
+            {id:1, actividad: "Inspección mensual de extintores", responsable: "Jefe de Mantenimiento", recursos: "Formato inspección, EPP", fechaInicio: "2024-01-01", fechaFin: "2024-12-31", estado: "En Progreso"},
+            {id:2, actividad: "Capacitación en manejo defensivo", responsable: "Coordinador SST", recursos: "Instructor, aula, material", fechaInicio: "2024-06-10", fechaFin: "2024-06-12", estado: "Completada"},
+            {id:3, actividad: "Simulacro de evacuación", responsable: "Brigada de Emergencia", recursos: "Plan de emergencia, personal", fechaInicio: "2024-11-15", fechaFin: "2024-11-15", estado: "Programada"},
+        ];
+        let nextPlanTrabajoId = 4;
+        function renderTablaPlanTrabajo() {
+             const tbody = document.getElementById('tablaPlanTrabajo').querySelector('tbody');
+            tbody.innerHTML = '';
+            planTrabajoData.forEach(item => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${item.actividad}</td>
+                    <td>${item.responsable}</td>
+                    <td>${item.recursos}</td>
+                    <td>${item.fechaInicio}</td>
+                    <td>${item.fechaFin}</td>
+                    <td>${item.estado}</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="showPlanTrabajoModal(${item.id})">Editar</button>
+                        <button class="btn-delete" onclick="deletePlanTrabajo(${item.id})">Eliminar</button>
+                    </td>
+                `;
+            });
+             updateDashboardStats();
+        }
+        function showPlanTrabajoModal(id = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalSaveButton = document.getElementById('modalSaveButton');
+            let item = id ? planTrabajoData.find(p => p.id === id) : null;
+
+            modalTitle.textContent = item ? 'Editar Actividad del Plan' : 'Agregar Actividad al Plan de Trabajo';
+            modalBody.innerHTML = `
+                <div class="form-group"><label for="planActividad">Actividad:</label><textarea id="planActividad" required>${item ? item.actividad : ''}</textarea></div>
+                <div class="form-group"><label for="planResponsable">Responsable:</label><input type="text" id="planResponsable" value="${item ? item.responsable : ''}" required></div>
+                <div class="form-group"><label for="planRecursos">Recursos:</label><textarea id="planRecursos">${item ? item.recursos : ''}</textarea></div>
+                <div class="form-group"><label for="planFechaInicio">Fecha Inicio:</label><input type="date" id="planFechaInicio" value="${item ? item.fechaInicio : ''}" required></div>
+                <div class="form-group"><label for="planFechaFin">Fecha Fin:</label><input type="date" id="planFechaFin" value="${item ? item.fechaFin : ''}" required></div>
+                <div class="form-group">
+                    <label for="planEstado">Estado:</label>
+                    <select id="planEstado" required>
+                        <option value="Programada" ${item && item.estado === 'Programada' ? 'selected' : ''}>Programada</option>
+                        <option value="En Progreso" ${item && item.estado === 'En Progreso' ? 'selected' : ''}>En Progreso</option>
+                        <option value="Completada" ${item && item.estado === 'Completada' ? 'selected' : ''}>Completada</option>
+                        <option value="Cancelada" ${item && item.estado === 'Cancelada' ? 'selected' : ''}>Cancelada</option>
+                        <option value="Retrasada" ${item && item.estado === 'Retrasada' ? 'selected' : ''}>Retrasada</option>
+                    </select>
+                </div>
+            `;
+            modalSaveButton.onclick = () => savePlanTrabajo(id);
+            document.getElementById('genericModal').style.display = 'block';
+        }
+         function savePlanTrabajo(id = null) {
+            const actividad = document.getElementById('planActividad').value;
+            const responsable = document.getElementById('planResponsable').value;
+            const recursos = document.getElementById('planRecursos').value;
+            const fechaInicio = document.getElementById('planFechaInicio').value;
+            const fechaFin = document.getElementById('planFechaFin').value;
+            const estado = document.getElementById('planEstado').value;
+
+            if (!actividad || !responsable || !fechaInicio || !fechaFin || !estado) {
+                alert('Por favor, complete todos los campos requeridos.');
+                return;
+            }
+            if (new Date(fechaFin) < new Date(fechaInicio)) {
+                alert('La fecha de fin no puede ser anterior a la fecha de inicio.');
+                return;
+            }
+
+            if (id) {
+                const index = planTrabajoData.findIndex(p => p.id === id);
+                if (index > -1) planTrabajoData[index] = { ...planTrabajoData[index], actividad, responsable, recursos, fechaInicio, fechaFin, estado };
+            } else {
+                planTrabajoData.push({ id: nextPlanTrabajoId++, actividad, responsable, recursos, fechaInicio, fechaFin, estado });
+            }
+            renderTablaPlanTrabajo();
+            closeModal();
+        }
+        function deletePlanTrabajo(id) {
+            if (confirm('¿Eliminar esta actividad del plan de trabajo?')) {
+                planTrabajoData = planTrabajoData.filter(p => p.id !== id);
+                renderTablaPlanTrabajo();
+            }
+        }
+
+
+        // Implementación - Capacitaciones
+        let capacitaciones = [
+            {id: 1, tema: "Uso seguro de herramientas eléctricas", fecha: "2024-08-15", instructor: "Juan Valdés (Externo)", participantes: "1,2", estado: "Programada"},
+            {id: 2, tema: "Primeros Auxilios Básicos", fecha: "2024-07-20", instructor: "Ana Rodríguez (Interno)", participantes: "1", estado: "Realizada"},
+        ];
+        let nextCapacitacionId = 3;
+
+        function getEmpleadoOptionsHTML(selectedIdsString = "") {
+            const selectedIds = selectedIdsString ? selectedIdsString.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : [];
+            return empleados.map(emp => 
+                `<option value="${emp.id}" ${selectedIds.includes(emp.id) ? 'selected' : ''}>${emp.nombre} (ID: ${emp.id})</option>`
+            ).join('');
+        }
+
+        function renderTablaCapacitaciones() {
+            const tbody = document.getElementById('tablaCapacitaciones').querySelector('tbody');
+            tbody.innerHTML = '';
+            capacitaciones.forEach(cap => {
+                const row = tbody.insertRow();
+                const participantesNombres = cap.participantes.split(',')
+                    .map(idStr => {
+                        const emp = empleados.find(e => e.id === parseInt(idStr.trim()));
+                        return emp ? emp.nombre : `ID ${idStr.trim()} no encontrado`;
+                    })
+                    .join('; ');
+                row.innerHTML = `
+                    <td>${cap.tema}</td>
+                    <td>${cap.fecha}</td>
+                    <td>${cap.instructor}</td>
+                    <td>${participantesNombres}</td>
+                    <td>${cap.estado}</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="showCapacitacionModal(${cap.id})">Editar</button>
+                        <button class="btn-delete" onclick="deleteCapacitacion(${cap.id})">Eliminar</button>
+                    </td>
+                `;
+            });
+            updateDashboardStats();
+        }
+
+        function showCapacitacionModal(id = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalSaveButton = document.getElementById('modalSaveButton');
+            let cap = id ? capacitaciones.find(c => c.id === id) : null;
+
+            modalTitle.textContent = cap ? 'Editar Capacitación' : 'Programar Capacitación';
+            modalBody.innerHTML = `
+                <div class="form-group"><label for="capTema">Tema:</label><input type="text" id="capTema" value="${cap ? cap.tema : ''}" required></div>
+                <div class="form-group"><label for="capFecha">Fecha:</label><input type="date" id="capFecha" value="${cap ? cap.fecha : ''}" required></div>
+                <div class="form-group"><label for="capInstructor">Instructor:</label><input type="text" id="capInstructor" value="${cap ? cap.instructor : ''}" required></div>
+                <div class="form-group">
+                    <label for="capParticipantes">Participantes (Seleccione empleados):</label>
+                    <select id="capParticipantes" multiple style="height: 150px;" required>
+                        ${getEmpleadoOptionsHTML(cap ? cap.participantes : '')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="capEstado">Estado:</label>
+                    <select id="capEstado" required>
+                        <option value="Programada" ${cap && cap.estado === 'Programada' ? 'selected' : ''}>Programada</option>
+                        <option value="Realizada" ${cap && cap.estado === 'Realizada' ? 'selected' : ''}>Realizada</option>
+                        <option value="Cancelada" ${cap && cap.estado === 'Cancelada' ? 'selected' : ''}>Cancelada</option>
+                    </select>
+                </div>
+            `;
+            modalSaveButton.onclick = () => saveCapacitacion(id);
+            document.getElementById('genericModal').style.display = 'block';
+        }
+
+        function saveCapacitacion(id = null) {
+            const tema = document.getElementById('capTema').value;
+            const fecha = document.getElementById('capFecha').value;
+            const instructor = document.getElementById('capInstructor').value;
+            const participantesSelect = document.getElementById('capParticipantes');
+            const participantes = Array.from(participantesSelect.selectedOptions).map(opt => opt.value).join(',');
+            const estado = document.getElementById('capEstado').value;
+
+            if(!tema || !fecha || !instructor || !participantes || !estado) { alert('Complete todos los campos requeridos para la capacitación.'); return; }
+
+            if (id) {
+                const index = capacitaciones.findIndex(c => c.id === id);
+                if (index > -1) capacitaciones[index] = { ...capacitaciones[index], tema, fecha, instructor, participantes, estado };
+            } else {
+                capacitaciones.push({ id: nextCapacitacionId++, tema, fecha, instructor, participantes, estado });
+            }
+            renderTablaCapacitaciones();
+            closeModal();
+        }
+
+        function deleteCapacitacion(id) {
+            if (confirm('¿Eliminar esta capacitación?')) {
+                capacitaciones = capacitaciones.filter(c => c.id !== id);
+                renderTablaCapacitaciones();
+            }
+        }
+
+        // Implementación - EPP (Esqueleto)
+        let eppData = [
+            {id:1, empleadoId: 1, eppEntregado: "Casco de seguridad", fechaEntrega: "2024-01-10", fechaProxCambio: "2025-01-10", cantidad: 1},
+            {id:2, empleadoId: 1, eppEntregado: "Guantes de vaqueta", fechaEntrega: "2024-01-10", fechaProxCambio: "2024-07-10", cantidad: 1},
+            {id:3, empleadoId: 2, eppEntregado: "Tapabocas N95", fechaEntrega: "2024-03-01", fechaProxCambio: "2024-03-15", cantidad: 10},
+        ];
+        let nextEppId = 4;
+        function renderTablaEPP() {
+             const tbody = document.getElementById('tablaEPP').querySelector('tbody');
+            tbody.innerHTML = '';
+            eppData.forEach(epp => {
+                const row = tbody.insertRow();
+                const empleado = empleados.find(em => em.id === epp.empleadoId);
+                row.innerHTML = `
+                    <td>${empleado ? empleado.nombre : `ID ${epp.empleadoId} no encontrado`} (${epp.empleadoId})</td>
+                    <td>${epp.eppEntregado}</td>
+                    <td>${epp.fechaEntrega}</td>
+                    <td>${epp.fechaProxCambio}</td>
+                    <td>${epp.cantidad}</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="showEPPModal(${epp.id})">Editar</button>
+                        <button class="btn-delete" onclick="deleteEPP(${epp.id})">Eliminar</button>
+                    </td>
+                `;
+            });
+        }
+        function showEPPModal(id = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalSaveButton = document.getElementById('modalSaveButton');
+            let epp = id ? eppData.find(item => item.id === id) : null;
+
+            modalTitle.textContent = epp ? 'Editar Entrega de EPP' : 'Registrar Entrega de EPP';
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label for="eppEmpleadoId">Empleado:</label>
+                    <select id="eppEmpleadoId" required>
+                        ${empleados.map(emp => `<option value="${emp.id}" ${epp && epp.empleadoId === emp.id ? 'selected' : ''}>${emp.nombre}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group"><label for="eppEntregado">EPP Entregado:</label><input type="text" id="eppEntregado" value="${epp ? epp.eppEntregado : ''}" required></div>
+                <div class="form-group"><label for="eppFechaEntrega">Fecha Entrega:</label><input type="date" id="eppFechaEntrega" value="${epp ? epp.fechaEntrega : ''}" required></div>
+                <div class="form-group"><label for="eppFechaProxCambio">Fecha Próximo Cambio:</label><input type="date" id="eppFechaProxCambio" value="${epp ? epp.fechaProxCambio : ''}"></div>
+                <div class="form-group"><label for="eppCantidad">Cantidad:</label><input type="number" id="eppCantidad" value="${epp ? epp.cantidad : 1}" min="1" required></div>
+            `;
+            modalSaveButton.onclick = () => saveEPP(id);
+            document.getElementById('genericModal').style.display = 'block';
+        }
+        function saveEPP(id = null) {
+            const empleadoId = parseInt(document.getElementById('eppEmpleadoId').value);
+            const eppEntregado = document.getElementById('eppEntregado').value;
+            const fechaEntrega = document.getElementById('eppFechaEntrega').value;
+            const fechaProxCambio = document.getElementById('eppFechaProxCambio').value;
+            const cantidad = parseInt(document.getElementById('eppCantidad').value);
+
+            if (!empleadoId || !eppEntregado || !fechaEntrega || !cantidad) {
+                alert('Por favor, complete todos los campos requeridos para el EPP.');
+                return;
+            }
+             if (fechaProxCambio && new Date(fechaProxCambio) < new Date(fechaEntrega)) {
+                alert('La fecha de próximo cambio no puede ser anterior a la fecha de entrega.');
+                return;
+            }
+
+            if (id) {
+                const index = eppData.findIndex(item => item.id === id);
+                if (index > -1) eppData[index] = { ...eppData[index], empleadoId, eppEntregado, fechaEntrega, fechaProxCambio, cantidad };
+            } else {
+                eppData.push({ id: nextEppId++, empleadoId, eppEntregado, fechaEntrega, fechaProxCambio, cantidad });
+            }
+            renderTablaEPP();
+            closeModal();
+        }
+        function deleteEPP(id) {
+             if (confirm('¿Eliminar este registro de entrega de EPP?')) {
+                eppData = eppData.filter(item => item.id !== id);
+                renderTablaEPP();
+            }
+        }
+
+        // Implementación - Incidentes (Esqueleto)
+        let incidentesData = [ // Usado también por el Dashboard
+            {id: 1, tipo: "Incidente", fecha: new Date(new Date().setDate(new Date().getDate()-5)).toISOString().split('T')[0], descripcion: "Casi caída de objeto pesado desde estantería.", empleadosInvolucrados: "1", estadoInvestigacion: "En proceso"},
+            {id: 2, tipo: "Accidente Leve", fecha: new Date(new Date().setDate(new Date().getDate()-15)).toISOString().split('T')[0], descripcion: "Corte menor en dedo con papel.", empleadosInvolucrados: "2", estadoInvestigacion: "Cerrada"},
+        ];
+        let nextIncidenteId = 3;
+        function renderTablaIncidentes() {
+            const tbody = document.getElementById('tablaIncidentes').querySelector('tbody');
+            tbody.innerHTML = '';
+            incidentesData.forEach(inc => {
+                const row = tbody.insertRow();
+                const involucradosNombres = inc.empleadosInvolucrados.split(',')
+                    .map(idStr => {
+                        const emp = empleados.find(e => e.id === parseInt(idStr.trim()));
+                        return emp ? emp.nombre : `ID ${idStr.trim()}`;
+                    })
+                    .join('; ');
+                row.innerHTML = `
+                    <td>${inc.id}</td>
+                    <td>${inc.tipo}</td>
+                    <td>${inc.fecha}</td>
+                    <td>${inc.descripcion}</td>
+                    <td>${involucradosNombres}</td>
+                    <td>${inc.estadoInvestigacion}</td>
+                    <td class="actions">
+                        <button class="btn-view" onclick="showIncidenteModal(${inc.id}, true)">Ver/Editar</button>
+                        <button class="btn-delete" onclick="deleteIncidente(${inc.id})">Eliminar</button>
+                    </td>
+                `;
+            });
+            updateDashboardStats();
+        }
+        function showIncidenteModal(id = null, isViewOrEdit = false) { // isViewOrEdit true to disable fields if just viewing.
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalSaveButton = document.getElementById('modalSaveButton');
+            let inc = id ? incidentesData.find(item => item.id === id) : null;
+            
+            modalTitle.textContent = inc ? (isViewOrEdit ? 'Ver/Editar Incidente/Accidente' : 'Editar Incidente/Accidente') : 'Reportar Incidente/Accidente';
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label for="incTipo">Tipo:</label>
+                    <select id="incTipo" required>
+                        <option value="Incidente" ${inc && inc.tipo === 'Incidente' ? 'selected' : ''}>Incidente (Casi Accidente)</option>
+                        <option value="Accidente Leve" ${inc && inc.tipo === 'Accidente Leve' ? 'selected' : ''}>Accidente Leve</option>
+                        <option value="Accidente Grave" ${inc && inc.tipo === 'Accidente Grave' ? 'selected' : ''}>Accidente Grave</option>
+                        <option value="Accidente Mortal" ${inc && inc.tipo === 'Accidente Mortal' ? 'selected' : ''}>Accidente Mortal</option>
+                        <option value="Enfermedad Laboral" ${inc && inc.tipo === 'Enfermedad Laboral' ? 'selected' : ''}>Enfermedad Laboral</option>
+                    </select>
+                </div>
+                <div class="form-group"><label for="incFecha">Fecha del Evento:</label><input type="date" id="incFecha" value="${inc ? inc.fecha : new Date().toISOString().split('T')[0]}" required></div>
+                <div class="form-group"><label for="incDescripcion">Descripción Detallada:</label><textarea id="incDescripcion" rows="4" required>${inc ? inc.descripcion : ''}</textarea></div>
+                <div class="form-group">
+                    <label for="incEmpleados">Empleado(s) Involucrado(s):</label>
+                    <select id="incEmpleados" multiple style="height:100px;" required>
+                         ${getEmpleadoOptionsHTML(inc ? inc.empleadosInvolucrados : '')}
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="incEstadoInv">Estado Investigación:</label>
+                    <select id="incEstadoInv" required>
+                        <option value="Pendiente Reporte" ${inc && inc.estadoInvestigacion === 'Pendiente Reporte' ? 'selected' : ''}>Pendiente Reporte</option>
+                        <option value="En proceso" ${inc && inc.estadoInvestigacion === 'En proceso' ? 'selected' : ''}>En proceso</option>
+                        <option value="Requiere Investigación Adicional" ${inc && inc.estadoInvestigacion === 'Requiere Investigación Adicional' ? 'selected' : ''}>Requiere Investigación Adicional</option>
+                        <option value="Cerrada" ${inc && inc.estadoInvestigacion === 'Cerrada' ? 'selected' : ''}>Cerrada</option>
+                    </select>
+                </div>
+                <!-- Podrían añadirse campos para causas, plan de acción, etc. -->
+            `;
+            modalSaveButton.onclick = () => saveIncidente(id);
+            document.getElementById('genericModal').style.display = 'block';
+        }
+        function saveIncidente(id = null) {
+            const tipo = document.getElementById('incTipo').value;
+            const fecha = document.getElementById('incFecha').value;
+            const descripcion = document.getElementById('incDescripcion').value;
+            const empleadosSelect = document.getElementById('incEmpleados');
+            const empleadosInvolucrados = Array.from(empleadosSelect.selectedOptions).map(opt => opt.value).join(',');
+            const estadoInvestigacion = document.getElementById('incEstadoInv').value;
+
+            if (!tipo || !fecha || !descripcion || !empleadosInvolucrados || !estadoInvestigacion) {
+                alert('Por favor, complete todos los campos requeridos para el incidente/accidente.');
+                return;
+            }
+
+            if (id) {
+                const index = incidentesData.findIndex(item => item.id === id);
+                if (index > -1) incidentesData[index] = { ...incidentesData[index], tipo, fecha, descripcion, empleadosInvolucrados, estadoInvestigacion };
+            } else {
+                incidentesData.push({ id: nextIncidenteId++, tipo, fecha, descripcion, empleadosInvolucrados, estadoInvestigacion });
+            }
+            renderTablaIncidentes();
+            closeModal();
+        }
+        function deleteIncidente(id) {
+            if (confirm('¿Eliminar este registro de incidente/accidente?')) {
+                incidentesData = incidentesData.filter(item => item.id !== id);
+                renderTablaIncidentes();
+            }
+        }
+
+
+        // Verificación - Auditorías (Esqueleto)
+        let auditoriasData = [];
+        let nextAuditoriaId = 1;
+        function renderTablaAuditorias() { /* ... */ }
+        function showAuditoriaModal(id = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalSaveButton = document.getElementById('modalSaveButton');
+            // let auditoria = id ? auditoriasData.find...
+            modalTitle.textContent = id ? 'Editar Auditoría' : 'Programar Auditoría Interna';
+            modalBody.innerHTML = `
+                <div class="form-group"><label for="audAlcance">Alcance:</label><textarea id="audAlcance" required></textarea></div>
+                <div class="form-group"><label for="audFechaProg">Fecha Programada:</label><input type="date" id="audFechaProg" required></div>
+                <div class="form-group"><label for="audAuditorLider">Auditor Líder:</label><input type="text" id="audAuditorLider" required></div>
+                <div class="form-group"><label for="audEstado">Estado:</label><select id="audEstado"><option>Programada</option><option>En Ejecución</option><option>Finalizada</option></select></div>
+                <div class="form-group"><label for="audHallazgos">Hallazgos (Resumen):</label><textarea id="audHallazgos"></textarea></div>
+            `;
+            modalSaveButton.onclick = () => { alert('Guardado de Auditoría pendiente de implementación completa.'); closeModal(); };
+            document.getElementById('genericModal').style.display = 'block';
+        }
+        
+        // Verificación - Revisión por la Dirección
+        function guardarRevisionDir() {
+            const fecha = document.getElementById('fechaRevisionDir').value;
+            const conclusiones = document.getElementById('conclusionesRevisionDir').value;
+            if (!fecha || !conclusiones) {
+                alert('Por favor, complete la fecha y las conclusiones de la revisión.');
+                return;
+            }
+            localStorage.setItem('revisionDir', JSON.stringify({ fecha, conclusiones }));
+            alert('Revisión por la Dirección guardada.');
+        }
+        function cargarRevisionDir() {
+            const data = localStorage.getItem('revisionDir');
+            if (data) {
+                const parsed = JSON.parse(data);
+                document.getElementById('fechaRevisionDir').value = parsed.fecha;
+                document.getElementById('conclusionesRevisionDir').value = parsed.conclusiones;
+            }
+        }
+
+        // Mejora Continua - Acciones (Esqueleto)
+        let accionesMejoraData = [];
+        let nextAccionMejoraId = 1;
+        function renderTablaAccionesMejora() { /* ... */ }
+        function showAccionMejoraModal(id = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalSaveButton = document.getElementById('modalSaveButton');
+            // let accion = id ? accionesMejoraData.find...
+            modalTitle.textContent = id ? 'Editar Acción de Mejora' : 'Registrar Acción de Mejora';
+            modalBody.innerHTML = `
+                <div class="form-group"><label for="accTipo">Tipo:</label><select id="accTipo"><option>Correctiva</option><option>Preventiva</option><option>De Mejora</option></select></div>
+                <div class="form-group"><label for="accOrigen">Origen (Auditoría ID, Incidente ID, etc.):</label><input type="text" id="accOrigen"></div>
+                <div class="form-group"><label for="accDescripcion">Descripción de la No Conformidad/Oportunidad:</label><textarea id="accDescripcion" required></textarea></div>
+                <div class="form-group"><label for="accResponsable">Responsable Ejecución:</label><input type="text" id="accResponsable" required></div>
+                <div class="form-group"><label for="accFechaLimite">Fecha Límite Implementación:</label><input type="date" id="accFechaLimite" required></div>
+                <div class="form-group"><label for="accEstado">Estado:</label><select id="accEstado"><option>Abierta</option><option>En Progreso</option><option>Cerrada (Verificada)</option><option>Cancelada</option></select></div>
+            `;
+            modalSaveButton.onclick = () => { alert('Guardado de Acción de Mejora pendiente de implementación completa.'); closeModal(); };
+            document.getElementById('genericModal').style.display = 'block';
+        }
+
+        // Gestión Documental (Esqueleto y ejemplo)
+        let documentosData = [
+            {id: 1, nombre: "Manual SG-SST", codigo: "IEB-SST-MAN-001", version: "3.0", fechaPublicacion: "2024-03-10", tipo: "Manual"},
+            {id: 2, nombre: "Procedimiento Trabajo Seguro en Alturas", codigo: "IEB-SST-PRO-005", version: "1.2", fechaPublicacion: "2024-01-20", tipo: "Procedimiento"},
+            {id: 3, nombre: "Formato Inspección de EPP", codigo: "IEB-SST-FOR-012", version: "1.0", fechaPublicacion: "2023-11-05", tipo: "Formato"},
+        ];
+        let nextDocumentoId = 4;
+
+        function renderTablaDocumentos(filterText = "") {
+            const tbody = document.getElementById('bodyTablaDocumentos');
+            tbody.innerHTML = '';
+            const filteredDocs = documentosData.filter(doc => 
+                doc.nombre.toLowerCase().includes(filterText.toLowerCase()) ||
+                doc.codigo.toLowerCase().includes(filterText.toLowerCase()) ||
+                doc.tipo.toLowerCase().includes(filterText.toLowerCase())
+            );
+
+            filteredDocs.forEach(doc => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${doc.nombre}</td>
+                    <td>${doc.codigo}</td>
+                    <td>${doc.version}</td>
+                    <td>${doc.fechaPublicacion}</td>
+                    <td>${doc.tipo}</td>
+                    <td class="actions">
+                        <button class="btn-view" onclick="viewDocumento(${doc.id})">Ver</button>
+                        <button class="btn-edit" onclick="showDocumentoModal(${doc.id})">Editar</button>
+                        <button class="btn-delete" onclick="deleteDocumento(${doc.id})">Eliminar</button>
+                    </td>
+                `;
+            });
+        }
+
+        function filtrarDocumentos() {
+            const filtro = document.getElementById('buscarDocumento').value;
+            renderTablaDocumentos(filtro);
+        }
+
+        function viewDocumento(id) {
+            const doc = documentosData.find(d => d.id === id);
+            alert(`Viendo documento (simulación):\nNombre: ${doc.nombre}\nCódigo: ${doc.codigo}\nVersión: ${doc.version}`);
+        }
+        function deleteDocumento(id) {
+            if (confirm('¿Eliminar este documento? Esta acción es simulada.')) {
+                documentosData = documentosData.filter(d => d.id !== id);
+                renderTablaDocumentos(document.getElementById('buscarDocumento').value);
+                alert('Documento eliminado (simulación).');
+            }
+        }
+
+        function showDocumentoModal(id = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalSaveButton = document.getElementById('modalSaveButton');
+            let doc = id ? documentosData.find(d => d.id === id) : null;
+
+            modalTitle.textContent = doc ? 'Editar Documento' : 'Subir Nuevo Documento';
+            modalBody.innerHTML = `
+                <div class="form-group"><label for="docNombre">Nombre Documento:</label><input type="text" id="docNombre" value="${doc ? doc.nombre : ''}" required></div>
+                <div class="form-group"><label for="docCodigo">Código:</label><input type="text" id="docCodigo" value="${doc ? doc.codigo : ''}" required></div>
+                <div class="form-group"><label for="docVersion">Versión:</label><input type="text" id="docVersion" value="${doc ? doc.version : ''}" required></div>
+                <div class="form-group"><label for="docFechaPub">Fecha Publicación:</label><input type="date" id="docFechaPub" value="${doc ? doc.fechaPublicacion : ''}" required></div>
+                <div class="form-group"><label for="docTipo">Tipo:</label><input type="text" id="docTipo" value="${doc ? doc.tipo : ''}" placeholder="Manual, Procedimiento, Formato, etc." required></div>
+                <div class="form-group"><label for="docFile">Archivo (simulado):</label><input type="file" id="docFile"></div>
+            `;
+            modalSaveButton.onclick = () => saveDocumento(id);
+            document.getElementById('genericModal').style.display = 'block';
+        }
+        function saveDocumento(id) {
+             const nombre = document.getElementById('docNombre').value;
+            const codigo = document.getElementById('docCodigo').value;
+            const version = document.getElementById('docVersion').value;
+            const fechaPublicacion = document.getElementById('docFechaPub').value;
+            const tipo = document.getElementById('docTipo').value;
+            // const fileInput = document.getElementById('docFile').files[0]; // Para manejo real de archivos
+
+            if (!nombre || !codigo || !version || !fechaPublicacion || !tipo) {
+                alert('Por favor, complete todos los campos del documento.');
+                return;
+            }
+
+            if (id) {
+                const index = documentosData.findIndex(d => d.id === id);
+                if (index > -1) {
+                    documentosData[index] = { ...documentosData[index], nombre, codigo, version, fechaPublicacion, tipo };
+                }
+            } else {
+                documentosData.push({ id: nextDocumentoId++, nombre, codigo, version, fechaPublicacion, tipo });
+            }
+            renderTablaDocumentos(document.getElementById('buscarDocumento').value);
+            alert('Documento guardado (simulación). En una aplicación real, el archivo se subiría al servidor.');
+            closeModal();
+        }
+
+
+        // Configuración
+        function guardarConfiguracion() {
+            const empresaNombre = document.getElementById('empresaNombre').value;
+            const empresaNit = document.getElementById('empresaNit').value;
+            const responsableSST = document.getElementById('responsableSST').value;
+             if (!empresaNombre || !empresaNit || !responsableSST) {
+                alert('Por favor, complete todos los campos de configuración.');
+                return;
+            }
+            localStorage.setItem('configSST', JSON.stringify({ empresaNombre, empresaNit, responsableSST }));
+            alert('Configuración guardada.');
+        }
+        function cargarConfiguracion() {
+            const data = localStorage.getItem('configSST');
+            if (data) {
+                const parsed = JSON.parse(data);
+                document.getElementById('empresaNombre').value = parsed.empresaNombre;
+                document.getElementById('empresaNit').value = parsed.empresaNit;
+                document.getElementById('responsableSST').value = parsed.responsableSST;
+            }
+        }
+
+
+        // --- MODAL GENÉRICO ---
+        function closeModal() {
+            document.getElementById('genericModal').style.display = 'none';
+            document.getElementById('modalBody').innerHTML = ''; // Limpiar contenido
+        }
+        window.onclick = function(event) { // Cierra el modal si se hace clic fuera
+            const modal = document.getElementById('genericModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+        
+        // --- DASHBOARD ---
+        function updateDashboardStats() {
+            document.getElementById('db-empleados-activos').textContent = empleados.length;
+            
+            const incidentesEsteMes = incidentesData.filter(inc => {
+                const fechaIncidente = new Date(inc.fecha);
+                const hoy = new Date();
+                return fechaIncidente.getFullYear() === hoy.getFullYear() && fechaIncidente.getMonth() === hoy.getMonth();
+            }).length;
+            document.getElementById('db-incidentes-mes').textContent = incidentesEsteMes;
+
+            const capacitacionesPendientes = capacitaciones.filter(c => c.estado === 'Programada').length;
+            document.getElementById('db-capacitaciones-pendientes').textContent = capacitacionesPendientes;
+            
+            const totalActividadesPlan = planTrabajoData.length;
+            const actividadesCompletadasPlan = planTrabajoData.filter(act => act.estado === 'Completada').length;
+            const cumplimientoPlan = totalActividadesPlan > 0 ? Math.round((actividadesCompletadasPlan / totalActividadesPlan) * 100) : 0;
+            document.getElementById('db-cumplimiento-plan').textContent = `${cumplimientoPlan}%`;
+
+            const politicaGuardada = localStorage.getItem('politicaSST');
+            if (politicaGuardada) {
+                 document.getElementById('alert-fecha-politica').textContent = JSON.parse(politicaGuardada).fecha;
+            } else {
+                 document.getElementById('alert-fecha-politica').textContent = "N/A";
+            }
+        }
+
+
+        // --- INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Cargar datos persistidos
+            cargarPoliticaGuardada();
+            cargarRevisionDir();
+            cargarConfiguracion();
+
+            // Renderizar tablas iniciales
+            renderTablaEmpleados();
+            renderTablaObjetivos();
+            renderTablaIPEVR();
+            renderTablaPlanTrabajo(); // Para que se muestren datos de ejemplo si los hay
+            renderTablaCapacitaciones();
+            renderTablaEPP();
+            renderTablaIncidentes();
+            renderTablaDocumentos(); // Para mostrar documentos de ejemplo y activar filtro
+            // Llamar a otras funciones de renderizado para las demás tablas...
+            // renderTablaAuditorias(); renderTablaAccionesMejora(); etc.
+            
+            updateDashboardStats(); // Actualizar estadísticas del dashboard al cargar
+            
+            // Por defecto, mostrar el dashboard
+            document.querySelector('.nav-link[data-module="dashboard"]').click();
+        });
+
+    </script>
+</body>
+</html>
